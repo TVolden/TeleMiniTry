@@ -1,0 +1,2 @@
+flask>=2.3.3
+flask-httpauth>=4.8.0
