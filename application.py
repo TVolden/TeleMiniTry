@@ -1,6 +1,7 @@
 import os
 import csv
-from flask import Flask, request, abort, Response
+import secrets
+from flask import Flask, request, abort, Response, render_template
 from flask_httpauth import HTTPBasicAuth
 
 app = Flask(__name__)
@@ -9,12 +10,14 @@ root_dir = os.getcwd()
 
 @auth.verify_password
 def verify_password(username, password):
-    if os.path.exists(f"{root_dir}/users.txt"):
-        with open(f"{root_dir}/users.txt", 'r') as users:
+    if username == "":
+        return None
+    
+    if os.path.exists(f"{root_dir}/{username}/.passwd"):
+        with open(f"{root_dir}/{username}/.passwd", 'r') as users:
             for line in users.readlines():
-                print(line)
-                user, passwd, _ = line.split(':', 3)
-                if username == user:
+                user, passwd = line.split(':', 2)
+                if username.lower() == user:
                     if password == passwd:
                         return user
                     else:
@@ -23,23 +26,42 @@ def verify_password(username, password):
 
 @auth.get_user_roles
 def get_user_roles(username):
+    print(username)
     if os.path.exists(f"{root_dir}/users.txt"):
         with open(f"{root_dir}/users.txt", 'r') as users:
             for line in users.readlines():
                 user, _, groups = line.split(':', 3)
-                if username == user:
-                    print(groups.split(','))
+                if username.lower() == user:
                     return groups.split(',')
+    return []
 
-def check_access(client)->bool:
-    return "admin" in get_user_roles(auth.current_user()) or auth.current_user() == client
+@app.route("/new", methods=['GET'])
+def index():
+    return render_template('new.html', error="")
+
+@app.route("/new", methods=['POST'])
+def create_client():
+    client = request.form["client"].lower()
+    if client == "":
+        return render_template('new.html', error="Please fill out.")
+    elif '.' in client:
+        return render_template('new.html', error="Invalid characters")
+    elif os.path.exists(f"{root_dir}/{client}/") or client == "new":
+        return render_template('new.html', error="Already exists.")
+    else:
+        passwd = secrets.token_urlsafe(8)
+        os.mkdir(f"{root_dir}/{client}/")
+        with open(f"{root_dir}/{client}/.passwd", mode='w') as pwfile:
+            pwfile.write(f"{client}:{passwd}")
+        return render_template('new_success.html', client=client, passwd=passwd)
+
 
 @app.route("/<client>", methods=['GET'])
 @auth.login_required
 def list_collections(client):
-    if check_access(client):
+    if auth.current_user() == client:
         if os.path.exists(f"{root_dir}/{client}/"):
-            return os.listdir(f"{root_dir}/{client}/")
+            return render_template('collections.html', client=client, collections=[f[0:-4] for f in os.listdir(f"{root_dir}/{client}/") if f.endswith(".csv")])
         else:
             return abort(404)
     else:
@@ -48,7 +70,7 @@ def list_collections(client):
 @app.route("/<client>/<collection>", methods=['GET'])
 @auth.login_required
 def get_collection(client, collection):
-    if check_access(client):
+    if auth.current_user() == client:
         if os.path.exists(f"{root_dir}/{client}/{collection}.csv"):
             with open(f"{root_dir}/{client}/{collection}.csv", 'r') as csvfile:
                 return Response(csvfile.read(), mimetype='text/csv')

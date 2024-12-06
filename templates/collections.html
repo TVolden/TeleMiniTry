@@ -1,0 +1,11 @@
+{% extends 'layout.html' %}
+
+{% block title %}Browsing {{ client }}{% endblock %}
+{% block content %}
+    <h1>Browsing <code>/{{ client }}</code>:</h1>
+    <p>Click the links to download the telemetry data in csv format.<br />You can also copy paste the url to import directly into Excel (credentials needed).</p>
+    {% for collection in collections %}
+        <a href="{{ url_for('get_collection', client=client, collection=collection) }}" target="_blank">{{ collection }}</a>
+    {% endfor %}
+
+{% endblock %}

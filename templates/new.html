@@ -1,0 +1,13 @@
+{% extends 'layout.html' %}
+
+{% block title %}Index{% endblock %}
+
+{% block content %}
+    <h1>Welcome to TeleMiniTry</h1>
+    <hr />
+    <h2>Create client</h2>
+    <form method="POST">
+        <input type="text" name="client" value="{{request.form['client']}}" placeholder="Client name"/> <span style="color: red;">{{error}}</span>
+        <br /><input type="submit" value="Create">
+    </form>
+{% endblock %}

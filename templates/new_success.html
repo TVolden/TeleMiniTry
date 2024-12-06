@@ -1,0 +1,35 @@
+{% extends 'layout.html' %}
+
+{% block title %}Index{% endblock %}
+
+{% block content %}
+    <h1>{{client}} created</h1>
+    <hr />
+    <h2>Save the following information. Use it to browse and download telemetry data.</h2>
+    <dl>
+        <dt>Username</dt>
+        <dd>{{client}}</dd>
+        <dt>Password</dt>
+        <dd>{{passwd}}</dd>
+        <dt>Direct link</dt>
+        <dd><a href="{{request.url[0:request.url.index(':')]}}://{{client}}:{{passwd}}@{{request.headers['Host']}}/{{client}}">{{request.url[0:request.url.index(':')]}}://{{client}}:{{passwd}}@{{request.headers['Host']}}/{{client}}</a></dd>
+    </dl>
+    <hr />
+    <h2>Getting started</h2>
+    <p>You can now push telemetry data to the client.</p>
+    <p>
+        Use http post calls with x-form data to any url under your client link:<br />
+        <code>{{request.url_root}}{{client}}/&lt;name-of-your-collection&gt;</code><br />
+        Replace <code>&lt;name-of-your-collection&gt;</code> with the name of your collection, eg. <code>sessions</code>
+    </p>
+    <p><span style="background-color:yellow; border: 1px solid black; padding: 5px;">
+        Notice! The first time you make a http post call, the collection will be created using the header names from the x-form data.
+        Every call hereafter will not be able to add new headers. In other words, only the headers that were defined in the first call is stored everything else is discarded.
+        It's recommended to create a new collection if the headers change, eg. <code>session-v2</code>
+    </span></p>
+    <p>
+        If you have trouble, you can use the echo test to see what the server receives:<br />
+        <code>{{request.url_root}}echo</code>
+    </p>
+
+{% endblock %}
