@@ -7,6 +7,7 @@ from flask_httpauth import HTTPBasicAuth
 app = Flask(__name__)
 auth = HTTPBasicAuth()
 root_dir = os.getcwd()
+reserved_names = ['new', 'echo']
 
 @auth.verify_password
 def verify_password(username, password):
@@ -46,7 +47,7 @@ def create_client():
         return render_template('new.html', error="Please fill out.")
     elif '.' in client:
         return render_template('new.html', error="Invalid characters")
-    elif os.path.exists(f"{root_dir}/{client}/") or client == "new":
+    elif os.path.exists(f"{root_dir}/{client}/") or client in reserved_names:
         return render_template('new.html', error="Already exists.")
     else:
         passwd = secrets.token_urlsafe(8)
