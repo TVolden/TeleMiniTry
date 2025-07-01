@@ -1,13 +1,16 @@
 import os
 import csv
 import secrets
-from flask import Flask, request, abort, Response, render_template
+from flask import Flask, request, abort, Response, render_template, CORS
 from flask_httpauth import HTTPBasicAuth
 
 app = Flask(__name__)
 auth = HTTPBasicAuth()
 root_dir = os.getcwd()
 reserved_names = ['new', 'echo']
+app.config['CORS_HEADERS'] = 'Content-Type'
+cors = CORS(app, resources={r"/<client>/<collection>": {"origins": "*"},
+                            r"/echo": {"origins": "*"}})
 
 @auth.verify_password
 def verify_password(username, password):
