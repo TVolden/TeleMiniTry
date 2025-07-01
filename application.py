@@ -9,8 +9,7 @@ auth = HTTPBasicAuth()
 root_dir = os.getcwd()
 reserved_names = ['new', 'echo']
 app.config['CORS_HEADERS'] = 'Content-Type'
-cors = CORS(app, resources={r"/<client>/<collection>": {"origins": "*"},
-                            r"/echo": {"origins": "*"}})
+cors = CORS(app)#, resources={r"/<client>/<collection>": {"origins": "*"}, r"/echo": {"origins": "*"}})
 
 @auth.verify_password
 def verify_password(username, password):
