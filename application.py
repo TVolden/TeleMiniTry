@@ -1,7 +1,8 @@
 import os
 import csv
 import secrets
-from flask import Flask, request, abort, Response, render_template, CORS
+from flask import Flask, request, abort, Response, render_template
+from flask_cors import CORS
 from flask_httpauth import HTTPBasicAuth
 
 app = Flask(__name__)
