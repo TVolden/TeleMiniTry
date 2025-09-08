@@ -1,4 +1,5 @@
 # TeleMiniTry
+[![DOI](https://zenodo.org/badge/898652756.svg)](https://doi.org/10.5281/zenodo.17077340)
 A small telemetry service in Python
 
 ## Installation
